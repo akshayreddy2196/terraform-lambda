@@ -1,0 +1,23 @@
+
+module "ecr" {
+  source           = "./modules/ecr"
+  repository_name  = "hello-lambda"
+}
+
+module "iam" {
+  source     = "./modules/iam"
+  role_name  = "lambda-execution-role"
+}
+
+module "lambda" {
+  source        = "./modules/lambda"
+  function_name = "hello-lambda"
+  image_uri     = "var.repository_name"
+  role_arn      = module.iam.aws_iam_role.this.arn
+}
+
+module "apigateway" {
+  source     = "./modules/apigateway"
+  api_name   = "hello-api"
+  lambda_arn = module.lambda.aws_lambda_function.this.arn
+}
