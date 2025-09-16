@@ -2,18 +2,31 @@ name: apply
 
 on:
   workflow_dispatch
+
+permissions:
+
+    id-token: write   # Required for OIDC
+    contents: read    # Required to clone the repo
 jobs:
   terraform:
     name: Terraform FMT, Validate & Plan
     runs-on: ubuntu-latest
 
-    env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
+    # env:
+    #       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+    #       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
+        #OIDC/IRSA Authentication - No more access keys!
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+         role-to-assume: "arn:aws:iam::445830509416:role/oicd-role"
+         #role-session-name: GitHubActions-Backend-${{ github.run_id }}
+         aws-region: "us-east-1"
 
 
       - name: Set up Terraform
@@ -28,12 +41,7 @@ jobs:
 
       - name: Terraform Validate
         run: terraform validate
-   
-
-     
-     
-
-
+      
       - name: Terraform Plan
         run: terraform plan -lock=false -input=false
    
