@@ -24,28 +24,21 @@ jobs:
       - name: Terraform Init
         run: terraform init -migrate-state
         #working-directory: backend
-        working-directory: environments/dev
+      
 
       - name: Terraform Validate
         run: terraform validate
-        working-directory: environments/dev
+   
 
      
-      - name: Generate Terraform Docs
-        uses: terraform-docs/gh-actions@v1.4.1
-        with:
-          #config-file: terraform-docs.yaml
-          working-dir: environments/dev
-          output-file: README.md 
-          output-method: inject
-          git-push: "false"  # Set to true if you want to auto-commit changes
+     
 
 
       - name: Terraform Plan
         run: terraform plan -lock=false -input=false
-        working-directory: environments/dev
+   
 
       - name: Terraform apply
         run: terraform apply -auto-approve
-        working-directory: environments/dev
+      
         
